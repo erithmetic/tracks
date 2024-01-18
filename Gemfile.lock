@@ -1,0 +1,15 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    concurrent-ruby (1.2.2)
+    gli (2.21.1)
+
+PLATFORMS
+  arm64-darwin-20
+
+DEPENDENCIES
+  concurrent-ruby (~> 1.2)
+  gli (~> 2.21)
+
+BUNDLED WITH
+   2.4.10
