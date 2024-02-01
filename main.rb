@@ -2,8 +2,8 @@ require 'concurrent'
 require 'fileutils'
 require 'gli'
 
-ALBUM_DIR="#{ENV['HOME']}/Music/Albums"
-TRACK_DIR="#{ENV['HOME']}/Music/Tracks"
+require_relative './lib/config'
+require_relative './lib/beats'
 
 # pool = Concurrent::ThreadPoolExecutor.new(
 #   min_threads: [2, Concurrent.processor_count].max,
@@ -12,10 +12,16 @@ TRACK_DIR="#{ENV['HOME']}/Music/Tracks"
 # )
 # futures = []
 
+def init
+  copy_aiffs
+  copy_mp3s
+  convert_root_flacs
+  convert_album_flacs
+end
 
 def copy_file(src)
   filename = File.basename src
-  dest = File.join(TRACK_DIR, filename)
+  dest = File.join(TRACKS_PATH, filename)
   puts "#{src} => #{dest}"
   FileUtils.cp src, dest
 end
@@ -30,7 +36,7 @@ def convert_file(src, dest_dir)
 end
 
 def clean
-  Dir.glob("#{TRACK_DIR}/**/*").each do |f|
+  Dir.glob("#{TRACKS_PATH}/**/*").each do |f|
     puts "rm -f #{f}"
     FileUtils.rm_rf f
   end
@@ -38,30 +44,30 @@ end
 
 def copy_aiffs
   puts "COPYING AIFFs"
-  Dir.glob("#{ALBUM_DIR}/**/*.aiff").each { |src| copy_file src }
+  Dir.glob("#{ALBUMS_PATH}/**/*.aiff").each { |src| copy_file src }
   puts ""
 end
 
 def copy_mp3s
   puts "COPYING MP3s"
-  Dir.glob("#{ALBUM_DIR}/**/*.mp3").each { |src| copy_file src }
+  Dir.glob("#{ALBUMS_PATH}/**/*.mp3").each { |src| copy_file src }
   puts ""
 end
 
 def convert_root_flacs
   puts "CONVERTING ROOT FLACs"
-  Dir.glob("#{ALBUM_DIR}/*.flac").each do |src|
-    convert_file src, TRACK_DIR
+  Dir.glob("#{ALBUMS_PATH}/*.flac").each do |src|
+    convert_file src, TRACKS_PATH
   end
   puts ""
 end
 
 def convert_album_flacs
   puts "CONVERTING ALBUM FLACs"
-  Dir.glob("#{ALBUM_DIR}/*").each do |f|
+  Dir.glob("#{ALBUMS_PATH}/*").each do |f|
     if File.directory?(f)
       Dir.glob("#{f}/*.flac").each do |flac|
-        dest_dir = File.join(TRACK_DIR, File.basename(f))
+        dest_dir = File.join(TRACKS_PATH, File.basename(f))
         Dir.mkdir dest_dir rescue nil
         convert_file flac, dest_dir
       end
@@ -70,15 +76,24 @@ def convert_album_flacs
   puts ""
 end
 
-def generate_vinyl_stubs
-
+def vinyl
+  Beats.each_album do |album|
+    album.tracks.each do |track|
+      write_vinyl_track album, track
+    end
+  end
 end
 
-def init
-  copy_aiffs
-  copy_mp3s
-  convert_root_flacs
-  convert_album_flacs
+def write_vinyl_track(album, track)
+  track_source_path = File.join(album.source_path, track.number.to_s) + '.wav'
+  track_dest_path = File.join(album.dest_path, track.filename) + '.wav'
+
+  if File.exist?(track_source_path)
+    FileUtils.mkdir_p File.dirname(track_dest_path)
+
+    puts "#{track_source_path} => #{track_dest_path}"
+    FileUtils.cp track_source_path, track_dest_path
+  end
 end
 
 def reset
@@ -91,9 +106,9 @@ class App
 
   program_desc 'tracks'
 
-  command :generate_vinyl_stubs do |c|
+  command :vinyl do |c|
     c.action do
-      generate_vinyl_stubs
+      vinyl
     end
   end
 
