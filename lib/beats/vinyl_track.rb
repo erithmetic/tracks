@@ -66,7 +66,6 @@ module Beats
       [current_volume, max_volume]
     end
 
-
     def insert_into_library!
       FileUtils.mkdir_p File.dirname(dest_path)
       FileUtils.cp source_path, dest_path
@@ -78,8 +77,9 @@ module Beats
 
       comments = [
         "Artists: #{artists.join(',')}",
-        "Labels: #{labels.join(', ')}"
-      ].join(' / ')
+        "Labels: #{labels.join(', ')}",
+        "Moods: #{track.description}",
+      ].join("\n")
 
       metadata = {
         album: album.title,

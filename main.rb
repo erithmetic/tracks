@@ -8,14 +8,8 @@ require 'open3'
 require_relative './lib/config'
 require_relative './lib/beats'
 
-# pool = Concurrent::ThreadPoolExecutor.new(
-#   min_threads: [2, Concurrent.processor_count].max,
-#   max_threads: [2, Concurrent.processor_count].max,
-#   fallback_policy: :caller_runs
-# )
-# futures = []
-
 def init
+  process_vinyl
   copy_aiffs
   copy_mp3s
   convert_root_flacs
@@ -79,19 +73,19 @@ def convert_album_flacs
   puts ""
 end
 
-def vinyl
+def process_vinyl
   Beats.each_vinyl_track do |vinyl|
     next unless File.exist? vinyl.source_path
 
     puts "#{vinyl.album.title} - #{vinyl.track_title}"
 
-    #print "HPF..."
-    #vinyl.apply_high_pass_filter!
-    #puts "done!"
+    print "HPF..."
+    vinyl.apply_high_pass_filter!
+    puts "done!"
 
-    #print "Amplify..."
-    #old_volume, new_volume = vinyl.amplify!
-    #puts "#{old_volume}dB => #{new_volume}dB done!"
+    print "Amplify..."
+    old_volume, new_volume = vinyl.amplify!
+    puts "#{old_volume}dB => #{new_volume}dB done!"
 
     print "Tag..."
     vinyl.tag!
@@ -114,7 +108,7 @@ class App
 
   command :vinyl do |c|
     c.action do
-      vinyl
+      process_vinyl
     end
   end
 
@@ -143,7 +137,3 @@ def main
 end
 
 main
-
-# while futures.any?(-> (f) { f.incomplete? }) do
-#   putc '.'
-# end
