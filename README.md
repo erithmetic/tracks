@@ -6,6 +6,8 @@ DJ tracks manager
 
 1. ruby 3.x
 1. ffmpeg
+1. Set up "DESCRIPTION" as a displayed field in MP3Tag
+  - This is due to ffmpeg not correctly writing comment tags
 
 # Usage
 
