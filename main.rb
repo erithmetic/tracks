@@ -83,27 +83,23 @@ def vinyl
   Beats.each_vinyl_track do |vinyl|
     next unless File.exist? vinyl.source_path
 
-    puts "#{vinyl.album.title} - #{vinyl.track.label}"
-    print "HPF..."
-    vinyl.apply_high_pass_filter!
+    puts "#{vinyl.album.title} - #{vinyl.track_title}"
+
+    #print "HPF..."
+    #vinyl.apply_high_pass_filter!
+    #puts "done!"
+
+    #print "Amplify..."
+    #old_volume, new_volume = vinyl.amplify!
+    #puts "#{old_volume}dB => #{new_volume}dB done!"
+
+    print "Tag..."
+    vinyl.tag!
     puts "done!"
-
-    print "Amplify..."
-    old_volume, new_volume = vinyl.amplify!
-    puts "#{old_volume}dB => #{new_volume}dB done!"
-
-    #write_vinyl_metadata album, track, track_source_path
     
     puts "cp #{vinyl.source_path} => #{vinyl.dest_path}"
     vinyl.insert_into_library!
   end
-end
-
-def write_vinyl_metadata(album, track, track_source_path)
-  discogs = Discogs::Wrapper.new('dj', user_token: ENV.fetch('DISCOGS_USER_TOKEN'))
-  info = discogs.get_release album.discogs_release
-
-  puts info
 end
 
 def reset

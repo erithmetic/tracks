@@ -14,7 +14,8 @@ ruby main.rb [CMD]
 # Workflow
 
 1. download beats (Google Sheets) => beats.csv
-1. download tracks + albums (flac, aiff, mp3) into ~/Music/Albums
+1. record vinyl to `~/Music/Track Originals`
+1. download tracks + albums (flac, aiff, mp3) into `~/Music/Albums`
 1. run `ruby main.rb reset`
 1. have a cup of tea
 1. edit tags in MP3Tag

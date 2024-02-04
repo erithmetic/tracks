@@ -1,3 +1,5 @@
+require 'open-uri'
+
 require_relative '../config'
 
 module Beats
@@ -28,6 +30,32 @@ module Beats
 
     def discogs_release
       discogs_url.split('/').last.split('-').first
+    end
+
+    def discogs_info
+      @discogs_info ||= discogs.get_release discogs_release
+    end
+
+    def discogs
+      Discogs::Wrapper.new('dj', user_token: ENV.fetch('DISCOGS_USER_TOKEN'))
+    end
+
+    def cover_path(ext)
+      File.join source_path, "cover.#{ext}"
+    end
+
+    def cover_image_path
+      if image_uri = discogs_info.images.first&.uri
+        ext = image_uri.split('.').last
+        path = cover_path(ext)
+        URI.open(image_uri) do |image|
+          File.open(path, 'w') do |f|
+            f.write image.read
+          end
+        end
+
+        return path
+      end
     end
   end
 end

@@ -7,9 +7,5 @@ module Beats
       @label = label
       @description = description
     end
-
-    def filename
-      [number, label].join(' - ')
-    end
   end
 end

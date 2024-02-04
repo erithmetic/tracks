@@ -15,3 +15,5 @@ gem "discogs-wrapper", "~> 2.5"
 group :test do
   gem "rspec"
 end
+
+gem "pry", "~> 0.14.2"
