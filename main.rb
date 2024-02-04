@@ -1,4 +1,6 @@
 require 'concurrent'
+require 'discogs-wrapper'
+require 'dotenv/load'
 require 'fileutils'
 require 'gli'
 require 'open3'
@@ -78,66 +80,35 @@ def convert_album_flacs
 end
 
 def vinyl
-  Beats.each_album do |album|
-    album.tracks.each do |track|
-      track_source_path = File.join(album.source_path, track.number.to_s) + '.wav'
+  Beats.each_vinyl_track do |vinyl|
+    next unless File.exist? vinyl.source_path
 
-      next unless File.exist? track_source_path
+    puts "#{vinyl.album.title} - #{vinyl.track.label}"
+    print "HPF..."
+    vinyl.apply_high_pass_filter!
+    puts "done!"
 
-      track_dest_path = File.join(album.dest_path, track.filename) + '.wav'
+    print "Amplify..."
+    old_volume, new_volume = vinyl.amplify!
+    puts "#{old_volume}dB => #{new_volume}dB done!"
 
-      highpass_vinyl_track track_source_path
-      amplify_vinyl_track track_source_path
-      write_vinyl_track track_source_path, track_dest_path
-    end
+    #write_vinyl_metadata album, track, track_source_path
+    
+    puts "cp #{vinyl.source_path} => #{vinyl.dest_path}"
+    vinyl.insert_into_library!
   end
 end
 
-def highpass_vinyl_track(track_source_path)
-  puts "Highpass filter #{track_source_path}"
-  tmp_path = "#{track_source_path}.tmp.wav"
-  ffmpeg "-i \"#{track_source_path}\" -af highpass=20 \"#{tmp_path}\""
-  FileUtils.mv tmp_path, track_source_path
-end
+def write_vinyl_metadata(album, track, track_source_path)
+  discogs = Discogs::Wrapper.new('dj', user_token: ENV.fetch('DISCOGS_USER_TOKEN'))
+  info = discogs.get_release album.discogs_release
 
-def amplify_vinyl_track(track_source_path)
-  out = ffmpeg "-i \"#{track_source_path}\" -filter:a volumedetect -f null /dev/null"
-
-  current_volume = out.match(/max_volume: (-?\d+\.\d+)/)[1].to_f
-  adjustment = if current_volume == MAX_VOLUME
-                 0
-               elsif current_volume < MAX_VOLUME
-                 current_volume.abs - MAX_VOLUME.abs
-               else
-                 -1 * current_volume + MAX_VOLUME
-               end
-
-  if adjustment == 0.0
-    puts "Not amplifying #{track_source_path}"
-  else
-    puts "Amplifying #{track_source_path} by #{adjustment}dB"
-    tmp_path = "#{track_source_path}.tmp.wav"
-    ffmpeg "-i \"#{track_source_path}\" -filter:a \"volume=#{adjustment}dB\" \"#{tmp_path}\""
-    FileUtils.mv tmp_path, track_source_path
-  end
-end
-
-def write_vinyl_track(track_source_path, track_dest_path)
-  FileUtils.mkdir_p File.dirname(track_dest_path)
-
-  puts "#{track_source_path} => #{track_dest_path}"
-  FileUtils.cp track_source_path, track_dest_path
+  puts info
 end
 
 def reset
   clean
   init
-end
-
-def ffmpeg(cmd)
-  _, out, status = Open3.capture3 "ffmpeg #{cmd}"
-  raise "Command failed: ffmpeg #{cmd}\n#{out}" unless status == 0
-  return out
 end
 
 class App
