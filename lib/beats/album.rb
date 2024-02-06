@@ -1,6 +1,7 @@
 require 'open-uri'
 
 require_relative '../config'
+require_relative './sanitize'
 
 module Beats
   class Album
@@ -24,8 +25,12 @@ module Beats
       File.join SOURCE_PATH, serial, 'cleaned'
     end
 
+    def finalized_path
+      File.join SOURCE_PATH, serial, 'finalized'
+    end
+
     def dest_path
-      File.join TRACKS_PATH, artist_title
+      File.join TRACKS_PATH, Sanitize.filename(artist_title)
     end
 
     def discogs_release

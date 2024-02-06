@@ -77,21 +77,19 @@ def process_vinyl
   Beats.each_vinyl_track do |vinyl|
     next unless File.exist? vinyl.source_path
 
+    vinyl.init
+
     puts "#{vinyl.album.title} - #{vinyl.track_title}"
 
-    print "HPF..."
-    vinyl.apply_high_pass_filter!
-    puts "done!"
-
-    print "Amplify..."
-    old_volume, new_volume = vinyl.amplify!
+    print "HPF + Amplify..."
+    old_volume, new_volume = vinyl.apply_hpf_and_amplify!
     puts "#{old_volume}dB => #{new_volume}dB done!"
 
     print "Tag..."
     vinyl.tag!
     puts "done!"
     
-    puts "cp #{vinyl.source_path} => #{vinyl.dest_path}"
+    puts "cp #{vinyl.finalized_path} => #{vinyl.dest_path}"
     vinyl.insert_into_library!
   end
 end
