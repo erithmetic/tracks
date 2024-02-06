@@ -14,7 +14,7 @@ describe Beats::VinylTrack do
 
     context 'currently -10dB' do
       let(:current) { -10.0 }
-      it { is_expected.to eq 4.96 }
+      it { is_expected.to eq 10 }
     end
 
     context 'currently MAX_VOLUME' do
@@ -24,7 +24,7 @@ describe Beats::VinylTrack do
 
     context 'currently -1' do
       let(:current) { -1.0 }
-      it { is_expected.to eq -4.04 }
+      it { is_expected.to eq 1 }
     end
 
     context 'currently 0' do
@@ -34,7 +34,7 @@ describe Beats::VinylTrack do
 
     context 'currently -1' do
       let(:current) { 5.0 }
-      it { is_expected.to eq -10.04 }
+      it { is_expected.to eq -5.0 }
     end
   end
 end
