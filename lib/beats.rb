@@ -1,6 +1,7 @@
 require 'csv'
 
 require_relative './beats/album'
+require_relative './beats/flac_track'
 require_relative './beats/track'
 require_relative './beats/vinyl_track'
 
@@ -15,6 +16,13 @@ module Beats
         track_file = VinylTrack.new album: album, track: track
         blk.call track_file
       end
+    end
+  end
+
+  def self.each_flac(&blk)
+    Dir.glob("#{ALBUMS_PATH}/**/*.flac").each do |f|
+      flac = Beats::FlacTrack.new path: f
+      blk.call flac
     end
   end
 

@@ -12,8 +12,7 @@ def init
   process_vinyl
   copy_aiffs
   copy_mp3s
-  convert_root_flacs
-  convert_album_flacs
+  process_flacs
 end
 
 def copy_file(src)
@@ -21,15 +20,6 @@ def copy_file(src)
   dest = File.join(TRACKS_PATH, filename)
   puts "#{src} => #{dest}"
   FileUtils.cp src, dest
-end
-
-def convert_file(src, dest_dir)
-  filename = File.basename src, '.flac'
-  dest = File.join(dest_dir, "#{filename}.wav")
-  cmd = "ffmpeg -y -i \"#{src}\" -c:a pcm_s24le -c:v copy \"#{dest}\""
-  result =  system cmd, [:out, :err] => "/dev/null"
-  raise "Failed to convert #{src}" unless result
-  puts "#{src} => #{dest}"
 end
 
 def clean
@@ -51,26 +41,11 @@ def copy_mp3s
   puts ""
 end
 
-def convert_root_flacs
-  puts "CONVERTING ROOT FLACs"
-  Dir.glob("#{ALBUMS_PATH}/*.flac").each do |src|
-    convert_file src, TRACKS_PATH
+def process_flacs
+  Beats.each_flac do |flac|
+    puts "#{flac.source_path} => #{flac.dest_path}"
+    flac.convert!
   end
-  puts ""
-end
-
-def convert_album_flacs
-  puts "CONVERTING ALBUM FLACs"
-  Dir.glob("#{ALBUMS_PATH}/*").each do |f|
-    if File.directory?(f)
-      Dir.glob("#{f}/*.flac").each do |flac|
-        dest_dir = File.join(TRACKS_PATH, File.basename(f))
-        Dir.mkdir dest_dir rescue nil
-        convert_file flac, dest_dir
-      end
-    end
-  end
-  puts ""
 end
 
 def process_vinyl
@@ -94,7 +69,7 @@ def process_vinyl
   end
 end
 
-def reset
+def all
   clean
   init
 end
@@ -118,14 +93,13 @@ class App
 
   command :flacs do |c|
     c.action do
-      convert_root_flacs
-      convert_album_flacs
+      process_flacs
     end
   end
 
-  command :reset do |c|
+  command :all do |c|
     c.action do 
-      reset
+      all
     end
   end
 end
