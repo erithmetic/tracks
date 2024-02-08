@@ -11,8 +11,16 @@ module Beats
       ext = path_parts.pop
       tmp_path = (path_parts + ['tmp', ext]).join('.')
       full_cmd = "-i \"#{path}\" #{cmd} \"#{tmp_path}\""
-      execute full_cmd
+      result = nil
+      begin
+        result = execute full_cmd
+      rescue Exception => e
+        FileUtils.rm_f tmp_path
+        raise e
+      end
+      puts result if ENV['DEBUG'] == 'true'
       FileUtils.mv tmp_path, path
     end
   end
 end
+ 
