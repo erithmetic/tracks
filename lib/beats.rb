@@ -20,7 +20,7 @@ module Beats
   end
 
   def self.each_flac(&blk)
-    Dir.glob("#{ALBUMS_PATH}/**/*.flac").each do |f|
+    Dir.glob("#{DIGITAL_PATH}/**/*.flac").each do |f|
       flac = Beats::FlacTrack.new path: f
       blk.call flac
     end

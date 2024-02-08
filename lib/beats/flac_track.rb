@@ -11,7 +11,7 @@ module Beats
     end
 
     def album_name
-      parts = path.sub(ALBUMS_PATH, '').split('/')
+      parts = path.sub(DIGITAL_PATH, '').split('/')
       if parts.length > 2
         parts[1]
       else

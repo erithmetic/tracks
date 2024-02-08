@@ -22,11 +22,11 @@ module Beats
     end
 
     def source_path
-      File.join SOURCE_PATH, serial, 'cleaned'
+      File.join VINYL_PATH, serial, 'cleaned'
     end
 
     def finalized_path
-      File.join SOURCE_PATH, serial, 'finalized'
+      File.join VINYL_PATH, serial, 'finalized'
     end
 
     def dest_path

@@ -31,13 +31,13 @@ end
 
 def copy_aiffs
   puts "COPYING AIFFs"
-  Dir.glob("#{ALBUMS_PATH}/**/*.aiff").each { |src| copy_file src }
+  Dir.glob("#{DIGITAL_PATH}/**/*.aiff").each { |src| copy_file src }
   puts ""
 end
 
 def copy_mp3s
   puts "COPYING MP3s"
-  Dir.glob("#{ALBUMS_PATH}/**/*.mp3").each { |src| copy_file src }
+  Dir.glob("#{DIGITAL_PATH}/**/*.mp3").each { |src| copy_file src }
   puts ""
 end
 
