@@ -4,7 +4,7 @@ require_relative '../../lib/beats/album'
 require_relative '../../lib/beats/track'
 require_relative '../../lib/beats/vinyl_track'
 
-describe Beats::VinylTrack do
+describe Beats::VinylConversion do
   describe '#amplification_amount' do
     let(:track) { Beats::Track.new number: 1, label: '1', description: 'foo' }
     let(:album) { Beats::Album.new serial: '123', artist: 'foo', title: 'bar', year: '1234', tracks: [track] }

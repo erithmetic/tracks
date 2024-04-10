@@ -4,16 +4,17 @@ source "https://rubygems.org"
 
 # gem "rails"
 
-gem "concurrent-ruby", "~> 1.2"
-
 gem "gli", "~> 2.21"
 
 gem "dotenv", "~> 2.8"
 
 gem "discogs-wrapper", "~> 2.5"
 
-group :test do
-  gem "rspec"
+group :development do
+  gem "solargraph", "~> 0.50.0"
 end
 
-gem "pry", "~> 0.14.2"
+group :development, :test do
+  gem "pry", "~> 0.14.2"
+  gem "rspec"
+end

@@ -7,19 +7,22 @@ DJ tracks manager
 1. ruby 3.x
 1. ffmpeg
 1. Set up "DESCRIPTION" as a displayed field in MP3Tag
-  - This is due to ffmpeg not correctly writing comment tags
+
+- This is due to ffmpeg not correctly writing comment tags
 
 # Usage
 
 ruby main.rb [CMD]
 
+to debug, set GLI_DEBUG=true
+
 # Workflow (human script)
 
 1. download beats (Google Sheets) => beats.csv
-1. record vinyl to `~/Music/Track Originals`
+1. record vinyl to `~/Music/Vinyl`
 1. de-noise vinyl with AudioLava / RX10 Repair Assistant to `~/Music/Track Originals/<serial>/cleaned`
 1. have a cup of tea
-1. download tracks + albums (flac, aiff, mp3) into `~/Music/Albums`
+1. download tracks + albums (flac, aiff, mp3) into `~/Music/Digital`
 1. run `ruby main.rb reset`
 1. have a cup of tea
 1. edit tags in MP3Tag

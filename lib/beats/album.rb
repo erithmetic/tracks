@@ -5,62 +5,72 @@ require_relative './sanitize'
 
 module Beats
   class Album
-    attr_reader :serial, :artist, :title, :year, :genres, :discogs_url, :tracks
+    attr_reader(
+      :serial,
+      :artist,
+      :title,
+      :year,
+      :genres,
+      :discogs_url,
+      :tracks,
+      :cover_image_path,
+      :all_artists,
+      :labels
+    )
 
-    def initialize(serial:, artist:, title:, year:, genres: [], discogs_url: '', tracks: [])
+
+    def self.from_metadata(albums:, metadata:, source_path:)
+      new(serial: nil, artist: nil, title: nil, year: nil)
+    end
+
+    def initialize(serial:, artist:, title:, year:, genres: [], discogs_url: '', tracks: [], all_artists: [], labels: [], cover_image_path: nil)
       @serial = serial
       @artist = artist
       @title = title
       @year = year
-      @genres = genres
+      @genres = genres || []
       @discogs_url = discogs_url
       @tracks = tracks
+      tracks.each { |t| t.album = self }
+      @all_artists = all_artists || []
+      @labels = labels
+      @cover_image_path = cover_image_path
     end
 
     def artist_title
       [artist, title].join(' - ')
     end
 
-    def source_path
-      File.join VINYL_PATH, serial, 'cleaned'
+    def find_track(num)
+      tracks.find { |t| t.number == num.to_i }
     end
 
-    def finalized_path
-      File.join VINYL_PATH, serial, 'finalized'
+    def merge(other)
+      self.class.new(
+        serial: serial || other.serial,
+        artist: artist || other.artist,
+        title: title || other.title,
+        year: year || other.year,
+        genres: genres,
+        discogs_url: discogs_url || other.discogs_url,
+        tracks: merge_tracks(other.tracks),
+        all_artists: (all_artists + other.all_artists).uniq,
+        labels: (labels + other.labels).uniq,
+        cover_image_path: cover_image_path || other.cover_image_path,
+      )
     end
 
-    def dest_path
-      File.join TRACKS_PATH, Sanitize.filename(artist_title)
-    end
-
-    def discogs_release
-      discogs_url.split('/').last.split('-').first
-    end
-
-    def discogs_info
-      @discogs_info ||= discogs.get_release discogs_release
-    end
-
-    def discogs
-      Discogs::Wrapper.new('dj', user_token: ENV.fetch('DISCOGS_USER_TOKEN'))
-    end
-
-    def cover_path(ext)
-      File.join source_path, "cover.#{ext}"
-    end
-
-    def cover_image_path
-      if image_uri = discogs_info.images.first&.uri
-        ext = image_uri.split('.').last
-        path = cover_path(ext)
-        URI.open(image_uri) do |image|
-          File.open(path, 'w') do |f|
-            f.write image.read
-          end
+    def merge_tracks(other_tracks)
+      trackpack = {}
+      (tracks + other_tracks).each do |track|
+        if matched_track = trackpack[track.number]
+          trackpack[track.number] = matched_track.merge(track)
+        else
+          trackpack[track.number] = track
         end
-
-        return path
       end
+
+      trackpack.values_at(*trackpack.keys.sort)
     end
   end
 end

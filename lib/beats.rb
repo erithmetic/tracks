@@ -1,9 +1,10 @@
 require 'csv'
 
 require_relative './beats/album'
-require_relative './beats/flac_track'
+require_relative './beats/flac_conversion'
 require_relative './beats/track'
-require_relative './beats/vinyl_track'
+require_relative './beats/track_file'
+require_relative './beats/vinyl_conversion'
 
 module Beats
   BEATS_CSV_PATH=File.expand_path('../../beats.csv', __FILE__)
@@ -13,7 +14,7 @@ module Beats
 
     albums.each do |album|
       album.tracks.each do |track|
-        track_file = VinylTrack.new album: album, track: track
+        track_file = VinylConversion.new album: album, track: track
         blk.call track_file
       end
     end
@@ -21,8 +22,15 @@ module Beats
 
   def self.each_flac(&blk)
     Dir.glob("#{DIGITAL_PATH}/**/*.flac").each do |f|
-      flac = Beats::FlacTrack.new path: f
-      blk.call flac
+      blk.call f
+    end
+  end
+
+  def self.each_output_track(&blk)
+    albums = parse_albums
+
+    DestinationTrackFile.each do |track|
+      blk.call track
     end
   end
 
@@ -39,7 +47,7 @@ module Beats
           label = parts.shift
           description = parts.join ' '
           track_count += 1
-          Track.new number: track_count, label: label, description: description
+          Track.new number: track_count, label: label, description: description, title: nil
         end
 
         album = Album.new(
