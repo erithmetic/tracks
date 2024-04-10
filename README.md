@@ -27,15 +27,17 @@ flowchart LR
   vinyl_script[/ruby main.rb vinyl/]
   export_script[/ruby main.rb export/]
   pdj[Pioneer DJ]
-  mik[Mixed in Key]
-  tag[MP3Tag]
-  beats[Beats.csv catalog]
+  mik[/Mixed in Key/]
+  tag[/MP3Tag/]
+  beats[(Beats.csv catalog)]
+  discogs[(Discogs.com API)]
 
   internet --> digital
   digital --> tag --> mik --> digital
   vinyl --> vinyl_script --> digital
   digital --> export_script --> tracks --> pdj
   beats --> export_script
+  discogs --> export_script
 ```
 
 # Workflow (human script)
