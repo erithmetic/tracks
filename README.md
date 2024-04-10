@@ -21,14 +21,14 @@ to debug, set GLI_DEBUG=true
 ```mermaid
 flowchart LR
   internet[Internet<br>(FLACs, MP3s, AIFFs)]
-  digital[Digital folder<br>~/Music/Digital"]
-  vinyl[Vinyl rips folder<br>~/Music/Vinyl"]
-  tracks[Tracks folder<br>~/Music/Tracks"]
-  vinyl_script[/ruby main.rb vinyl"/]
-  export_script[/ruby main.rb export"/]
-  pdj[Pioneer DJ"]
-  mik[Mixed in Key"]
-  tag[MP3Tag"]
+  digital[Digital folder<br>~/Music/Digital]
+  vinyl[Vinyl rips folder<br>~/Music/Vinyl]
+  tracks[Tracks folder<br>~/Music/Tracks]
+  vinyl_script[/ruby main.rb vinyl/]
+  export_script[/ruby main.rb export/]
+  pdj[Pioneer DJ]
+  mik[Mixed in Key]
+  tag[MP3Tag]
 
   internet --> digital
   digital --> tag --> mik --> digital
