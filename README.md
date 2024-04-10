@@ -29,11 +29,13 @@ flowchart LR
   pdj[Pioneer DJ]
   mik[Mixed in Key]
   tag[MP3Tag]
+  beats[Beats.csv catalog]
 
   internet --> digital
   digital --> tag --> mik --> digital
   vinyl --> vinyl_script --> digital
   digital --> export_script --> tracks --> pdj
+  beats --> export_script
 ```
 
 # Workflow (human script)
