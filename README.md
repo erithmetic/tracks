@@ -16,6 +16,26 @@ ruby main.rb [CMD]
 
 to debug, set GLI_DEBUG=true
 
+# Data pipeline
+
+```mermaid
+flowchart LR
+  internet as "Internet<br>(FLACs, MP3s, AIFFs)"
+  digital as "Digital folder<br>~/Music/Digital"
+  vinyl as "Vinyl rips folder<br>~/Music/Vinyl"
+  tracks as "Tracks folder<br>~/Music/Tracks"
+  vinyl_script as "ruby main.rb vinyl"
+  export_script as "ruby main.rb export"
+  pdj as "Pioneer DJ"
+  mik as "Mixed in Key"
+  tag as "MP3Tag"
+
+  internet --> digital
+  digital --> tag --> mik --> digital
+  vinyl --> vinyl_script --> digital
+  digital --> export_script --> tracks --> pdj
+```
+
 # Workflow (human script)
 
 1. download beats (Google Sheets) => beats.csv
