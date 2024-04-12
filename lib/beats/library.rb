@@ -26,9 +26,18 @@ module Beats
 
       track
     end
+    
+    def track_from_catalog_and_track(catalog_number:, track_number:)
+      album = album_from_beats catalog_number
+      album = album.merge(album_from_discogs(album.discogs_url))
+      track = album.find_track(track_number)
+      raise "Track not found: #{metadata.inspect}" if track.nil?
 
-    def album_from_beats(serial)
-      beats_albums.find { |a| a.serial == serial }
+      track
+    end
+
+    def album_from_beats(catalog_number)
+      beats_albums.find { |a| a.serial == catalog_number }
     end
 
     def album_from_metadata(metadata)

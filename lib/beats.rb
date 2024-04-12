@@ -10,12 +10,13 @@ module Beats
   BEATS_CSV_PATH=File.expand_path('../../beats.csv', __FILE__)
 
   def self.each_vinyl_track(&blk)
-    albums = parse_albums
+    Dir.glob("#{VINYL_PATH}/*").each do |album_dir|
+      next if album_dir =~ /^\./ || !File.directory?(album_dir)
+      catalog_number = File.basename album_dir
 
-    albums.each do |album|
-      album.tracks.each do |track|
-        track_file = VinylConversion.new album: album, track: track
-        blk.call track_file
+      Dir.glob(File.join(album_dir, 'cleaned', '*.aiff')).each do |file|
+        track_number = File.basename(file, '*.aiff')
+        blk.call catalog_number, track_number, file
       end
     end
   end
@@ -42,7 +43,7 @@ module Beats
         serial = row['Serial'] or raise "no serial for #{row}"
 
         track_count = 0
-        tracks = row['Notes'].split(',').map do |line|
+        tracks = row['Notes'].to_s.split(',').map do |line|
           parts = line.split(' ')
           label = parts.shift
           description = parts.join ' '

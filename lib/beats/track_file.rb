@@ -20,6 +20,10 @@ module Beats
       @metadata = {}
     end
 
+    def exist?
+      File.exist? path
+    end
+
     def ext
       path.split('.').last
     end

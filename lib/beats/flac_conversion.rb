@@ -9,16 +9,13 @@ module Beats
 
     def self.from_file(library:, path:)
       cover_image_path = File.join(File.dirname(path), 'cover.jpg')
-      source_file = TrackFile.read library: library, path: path
+      source_file = TrackFile.read library: library, path: path, cover_image_path: cover_image_path
       new source_file: source_file
     end
 
     def initialize(source_file:)
       @source_file = source_file
       @dest_file = DestinationTrackFile.new album: source_file.album, track: source_file.track
-    end
-
-    def cover_path
     end
 
     def process!

@@ -7,24 +7,23 @@ module Beats
   class VinylConversion
     SOURCE_EXT = '.aiff'
 
-    attr_reader :album, :track, :dest_file
+    attr_reader :source_file, :dest_file, :album, :track
 
-    def initialize(album:, track:)
-      @album = album
+    def self.from_file(library:, catalog_number:, track_number:, path:)
+      track = library.track_from_catalog_and_track catalog_number: catalog_number, track_number: track_number
+      new track: track
+    end
+
+    def initialize(track:)
       @track = track
-      @dest_file = DestinationTrackFile.new album: album, track: track, ext: SOURCE_EXT
-    end
-
-    def source_path
-      File.join(VINYL_PATH, album.serial, 'cleaned', track.number.to_s) + SOURCE_EXT
-    end
-
-    def tmp_path
-      File.join VINYL_PATH, album.serial, 'tmp', dest_filename + SOURCE_EXT
+      @album = track.album
+      source_path = File.join(VINYL_PATH, album.serial, 'cleaned', track.number.to_s) + SOURCE_EXT
+      @source_file = TrackFile.new path: source_path, album: album, track: track
+      @dest_file = DestinationTrackFile.new album: album, track: track
     end
 
     def max_volume
-      out = FFMPEG.execute "-i \"#{tmp_path}\" -filter:a volumedetect -f null /dev/null"
+      out = FFMPEG.execute "-i \"#{dest_file.path}\" -filter:a volumedetect -f null /dev/null"
       out.match(/max_volume: (-?\d+\.\d+)/)[1].to_f
     end
 
@@ -39,8 +38,9 @@ module Beats
     end
 
     def process!
-      FileUtils.mkdir_p tmp_path
-      FileUtils.cp source_path, tmp_path, preserve: false
+      dest_file.ensure_dest_path!
+
+      FileUtils.cp source_file.path, dest_file.path
 
       filters = []
       current_volume = max_volume
@@ -61,10 +61,8 @@ module Beats
         'silenceremove=start_periods=1:start_silence=0:start_threshold=0.02'
       ]
 
-      FFMPEG.apply! tmp_path, "-c:a pcm_s24be -filter:a \"#{filters.join(', ')}\""
-
-      dest_file.ensure_dest_path!
-      FileUtils.cp tmp_path, dest_file.path
+      FFMPEG.apply! dest_file.path, "-c:a pcm_s24be -filter:a \"#{filters.join(', ')}\""
+      dest_file.write_cover_image!
       dest_file.write_metadata!
     end
   end

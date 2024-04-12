@@ -16,16 +16,14 @@ module Beats
     end
 
     def path
-      File.join(TRACKS_PATH, Sanitize.filename(album.artist_title), filename) + EXT
+      @path ||= File.join(TRACKS_PATH, Sanitize.filename(album.artist_title), filename) + EXT
     end
 
     def filename
-      track_title = Sanitize.filename(track.title)
-      [Sanitize.filename(album.artist_title), track.number.to_s.rjust(2,'0'), track_title].join(' - ')
-    end
+      return @filename unless @filename.nil?
 
-    def exist?
-      File.exist? path
+      track_title = Sanitize.filename(track.title.to_s)
+      @filename = [Sanitize.filename(album.artist_title), track.number.to_s.rjust(2,'0'), track_title].join(' - ')
     end
 
     def ensure_dest_path!

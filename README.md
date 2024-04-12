@@ -25,31 +25,37 @@ flowchart LR
   vinyl["Vinyl rips folder<br>~/Music/Vinyl"]
   tracks["Tracks folder<br>~/Music/Tracks"]
   vinyl_script[/ruby main.rb vinyl/]
-  export_script[/ruby main.rb export/]
+  export_script[/ruby main.rb digital/]
   pdj[Pioneer DJ]
   mik[/Mixed in Key/]
   tag[/MP3Tag/]
   beats[(Beats.csv catalog)]
   discogs[(Discogs.com API)]
+  rx10[/AudioLava<br>RX 10 Repair Assistant/]
+  usb[(USB)]
 
   internet --> digital
-  digital --> tag --> mik --> digital
-  vinyl --> vinyl_script --> digital
+  digital --> tag --> digital
+  vinyl --> rx10 --> vinyl_script --> digital
   digital --> export_script --> tracks --> pdj
+  pdj --> mik --> tracks
   beats --> export_script
   discogs --> export_script
+  pdj --> usb
 ```
 
 # Workflow (human script)
 
-1. download beats (Google Sheets) => beats.csv
-1. record vinyl to `~/Music/Vinyl`
-1. de-noise vinyl with AudioLava / RX10 Repair Assistant to `~/Music/Track Originals/<serial>/cleaned`
-1. have a cup of tea
-1. download tracks + albums (flac, aiff, mp3) into `~/Music/Digital`
-1. run `ruby main.rb reset`
-1. have a cup of tea
+1. Download beats (Google Sheets) => beats.csv
+1. Use Audacity to record vinyl to `~/Music/Vinyl/<serial>/<serial>.aup`
+1. De-noise vinyl with AudioLava / RX10 Repair Assistant
+1. Label track start positions (1-N)
+1. Run File->Export as AIFF to to `~/Music/Vinyl/<serial>/cleaned` (96kHz, 32-bit float)
+1. run `ruby main.rb vinyl`
+1. Download tracks + albums (flac, aiff, mp3) into `~/Music/Digital`
 1. edit tags in MP3Tag
+1. run `ruby main.rb digital`
+1. have a cup of tea
 1. reimport `~/Music/Tracks` in Rekordbox
 1. have a cup of tea
 1. export music library to `~/Music/rekordbox.xml`
