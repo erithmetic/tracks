@@ -73,7 +73,7 @@ module Beats
       return nil unless image_uri
 
       ext = image_uri.split('.').last
-      image_path = File.join path, "cover.#{ext}"
+      image_path = File.join path, "#{release}.#{ext}"
 
       return image_path if File.exist? image_path
 
