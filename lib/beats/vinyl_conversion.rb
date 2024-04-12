@@ -19,7 +19,7 @@ module Beats
       @album = track.album
       source_path = File.join(VINYL_PATH, album.serial, 'cleaned', track.number.to_s) + SOURCE_EXT
       @source_file = TrackFile.new path: source_path, album: album, track: track
-      @dest_file = DestinationTrackFile.new album: album, track: track
+      @dest_file = DigitalTrackFile.new album: album, track: track
     end
 
     def max_volume

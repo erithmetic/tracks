@@ -32,6 +32,13 @@ module Beats
       File.dirname path
     end
 
+    def filename
+      return @filename unless @filename.nil?
+
+      track_title = Sanitize.filename(track.title.to_s)
+      @filename = [Sanitize.filename(album.artist_title), track.number.to_s.rjust(2,'0'), track_title].join(' - ')
+    end
+
     def album_name
       parts = path.sub(DIGITAL_PATH, '').split('/')
       if parts.length > 2
@@ -58,6 +65,10 @@ module Beats
         track: track.number,
         CATALOGNUMBER: album.serial,
       }
+    end
+
+    def ensure_dest_path!
+      FileUtils.mkdir_p File.dirname(path)
     end
 
     def write_metadata!
