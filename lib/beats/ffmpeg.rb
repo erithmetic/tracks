@@ -1,12 +1,22 @@
+require 'json'
 require 'open3'
 
+require_relative './metadata'
 require_relative './track_file'
 
 module Beats
   module FFMPEG
-    def self.execute(cmd, allow_error: false)
-      _, out, status = Open3.capture3 "ffmpeg #{cmd}"
-      raise "Command failed: ffmpeg #{cmd}\n#{out}" if status != 0 && !allow_error
+    def self.process(params)
+      execute 'ffmpeg', params
+    end
+
+    def self.probe(params)
+      `ffprobe #{params}`
+    end
+
+    def self.execute(cmd, params)
+      _, out, status = Open3.capture3 "#{cmd} #{params}"
+      raise "Command failed: ffmpeg #{params}\n#{out}" if status != 0
       return out
     end
 
@@ -27,12 +37,8 @@ module Beats
     end
 
     def self.write_id3!(path, metadata)
-      # cover_image_command = if cover_image_path
-      #   "-i \"#{cover_image_path}\"  -c copy -map 0 -map 1"
-      # end
-
-      metadata_commands = metadata.inject("") do |list, (key, value)|
-        list = list + "-metadata #{key}=\"#{value}\" "
+      metadata_commands = metadata.to_ffmpeg_metadata.inject("") do |list, (key, value)|
+        list = list + "-metadata #{key}=\"#{value.to_s.gsub(/"/,"\\\"")}\" "
       end
 
       FFMPEG.apply! path, "#{metadata_commands} -id3v2_version 3 -write_id3v2 1"
@@ -45,31 +51,8 @@ module Beats
     end
 
     def self.info(path)
-      raw = execute "-i \"#{path}\"", allow_error: true
-      metadata = {}
-
-      current_key = nil
-      raw.lines.each do |line|
-        return metadata if line =~ /Stream #\d/
-
-        matches = line.match(/([^:]*):\s(.+)/)
-        next if matches.nil?
-
-        value = matches[2]
-        if key = matches[1]
-          stripped_key = key.strip.to_sym
-          if Beats::TrackFile::METADATA_KEYS.include?(stripped_key)
-            current_key = stripped_key
-            metadata[current_key] = ''
-          else
-            current_key = nil
-          end
-        end
-
-        metadata[current_key] += value unless current_key.nil?
-      end
-
-      metadata
+      json = probe "-loglevel error -show_entries stream_tags:format_tags -of json \"#{path}\""
+      Metadata.from_from_ffprobe JSON.parse(json)
     end
   end
 end

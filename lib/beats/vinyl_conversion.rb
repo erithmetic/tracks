@@ -1,7 +1,9 @@
 require_relative '../config'
 require_relative './destination_track_file'
 require_relative './ffmpeg'
+require_relative './track_file'
 require_relative './sanitize'
+require_relative './vinyl_track_file'
 
 module Beats
   class VinylConversion
@@ -19,7 +21,7 @@ module Beats
       @album = track.album
       source_path = File.join(VINYL_PATH, album.serial, 'cleaned', track.number.to_s) + SOURCE_EXT
       @source_file = TrackFile.new path: source_path, album: album, track: track
-      @dest_file = DigitalTrackFile.new album: album, track: track
+      @dest_file = VinylTrackFile.new album: album, track: track
     end
 
     def max_volume
@@ -39,6 +41,7 @@ module Beats
 
     def process!
       dest_file.ensure_dest_path!
+      return if dest_file.exist?
 
       FileUtils.cp source_file.path, dest_file.path
 

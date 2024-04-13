@@ -7,7 +7,9 @@ require 'gli'
 
 require_relative './lib/config'
 require_relative './lib/beats'
+require_relative './lib/beats/destination_track_file'
 require_relative './lib/beats/library'
+require_relative './lib/beats/track_file'
 
 class App
   extend GLI::App
@@ -24,9 +26,9 @@ class App
     end
   end
 
-  command :digital do |c|
+  command :export do |c|
     c.action do
-      app.process_flacs
+      # app.process_flacs
       app.process_aiffs
       app.process_mp3s
     end
@@ -36,30 +38,22 @@ class App
     @library ||= Beats::Library.load
   end
 
-  def copy_file(src)
-    filename = File.basename src
+  def copy_file(path)
+    filename = File.basename path
     dest = File.join(TRACKS_PATH, filename)
-    puts "#{src} => #{dest}"
-    FileUtils.cp src, dest
-  end
-
-  def clean
-    Dir.glob("#{TRACKS_PATH}/**/*").each do |f|
-      puts "rm -f #{f}"
-      FileUtils.rm_rf f
-    end
+    source_file = Beats::TrackFile.read library: library, path: path
+    dest_file = Beats::DestinationTrackFile.new album: source_file.album, track: source_file.track
+    dest_file.ensure_dest_path!
+    puts "#{source_file.path} => #{dest_file.path}"
+    FileUtils.cp source_file.path, dest_file.path
   end
 
   def process_aiffs
-    puts "COPYING AIFFs"
-    Dir.glob("#{DIGITAL_PATH}/**/*.aiff").each { |src| copy_file src }
-    puts ""
+    Dir.glob("#{DIGITAL_PATH}/**/*.aiff").each { |path| copy_file path }
   end
 
   def process_mp3s
-    puts "COPYING MP3s"
-    Dir.glob("#{DIGITAL_PATH}/**/*.mp3").each { |src| copy_file src }
-    puts ""
+    Dir.glob("#{DIGITAL_PATH}/**/*.mp3").each { |path| copy_file path }
   end
 
   def process_flacs

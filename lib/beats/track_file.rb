@@ -1,14 +1,14 @@
 require_relative './ffmpeg'
+require_relative './metadata'
+require_relative './sanitize'
 
 module Beats
-  class TrackFile
-    METADATA_KEYS = %i{ALBUM ARTIST DATE description genre TITLE track CATALOGNUMBER album_artist comment}
-    
+  class TrackFile    
     attr_reader :path, :album, :track, :metadata, :cover_image_path
 
     def self.read(library:, path:, cover_image_path: nil)
       metadata = FFMPEG.info path
-      track = library.track_from_metadata metadata
+      track = library.find_track_by_metadata metadata
       new path: path, album: track.album, track: track, cover_image_path: cover_image_path
     end
 
@@ -17,7 +17,6 @@ module Beats
       @album = album
       @track = track
       @cover_image_path = cover_image_path || track.album.cover_image_path
-      @metadata = {}
     end
 
     def exist?
@@ -55,16 +54,16 @@ module Beats
         track.description,
       ].join("\n")
 
-      return {
+      return Metadata.new(
+        catalog_number: album.serial,
         album: album.title,
         artist: album.artist,
-        date: album.year,
-        description: comments,
-        genre: album.genres.join(', '),
         title: track.title,
-        track: track.number,
-        CATALOGNUMBER: album.serial,
-      }
+        year: album.year,
+        track_number: track.number,
+        description: comments,
+        genre: album.genres.join(', ')
+      )
     end
 
     def ensure_dest_path!

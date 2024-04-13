@@ -27,14 +27,6 @@ module Beats
     end
   end
 
-  def self.each_output_track(&blk)
-    albums = parse_albums
-
-    DestinationTrackFile.each do |track|
-      blk.call track
-    end
-  end
-
   def self.parse_albums
     albums = []
 

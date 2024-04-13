@@ -17,7 +17,7 @@ module Beats
 
       info = fetch_file(release) || fetch_discogs(release)
 
-      all_artists = info.artists.map(&:anv)
+      all_artists = info.artists&.map(&:anv)
       image_uri = info.images.first&.uri
       labels = info.labels.map(&:name)
       track_number = 0
@@ -47,9 +47,9 @@ module Beats
 
     def fetch_file(release)
       path = release_path(release)
-      if File.exist?(release)
+      if File.exist?(path)
         data = nil
-        File.open(release) do |f|
+        File.open(path) do |f|
           data = Marshal.load(f.read)
         end
       else

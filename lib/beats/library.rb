@@ -15,14 +15,19 @@ module Beats
       @discogs_cache = DiscogsCache.new
     end
 
-    def track_from_metadata(metadata)
+    def find_track_by_metadata(metadata)
       album = album_from_metadata metadata
-      if beats_album = album_from_beats(metadata[:CATALOGNUMBER])
+      track = track_from_metadata metadata
+      track.album = album
+      
+      if beats_album = album_from_beats(album.serial)
         album = album.merge(beats_album)
+        
+        raise "No discogs URL for album #{album.title}" if beats_album.discogs_url.nil?
+
         album = album.merge(album_from_discogs(beats_album.discogs_url))
+        track = album.find_track(track.number)
       end
-      track = album.find_track(metadata[:track])
-      raise "Track not found: #{metadata.inspect}" if track.nil?
 
       track
     end
@@ -42,20 +47,20 @@ module Beats
 
     def album_from_metadata(metadata)
       Album.new(
-        serial: metadata[:CATALOGNUMBER],
-        artist: metadata[:ARTIST],
-        title: metadata[:ALBUM],
-        year: metadata[:DATE],
-        tracks: [build_track_from_metadata(metadata)]
+        serial: metadata.catalog_number,
+        artist: metadata.artist,
+        title: metadata.album,
+        year: metadata.year,
+        tracks: [track_from_metadata(metadata)]
       )
     end
 
-    def build_track_from_metadata(metadata)
+    def track_from_metadata(metadata)
       Track.new(
-        number: metadata[:track],
+        number: metadata.track_number,
         label: nil,
-        title: metadata[:TITLE],
-        description: metadata[:comment],
+        title: metadata.title,
+        description: metadata.comment,
       )
     end
 
