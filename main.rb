@@ -28,7 +28,7 @@ class App
 
   command :export do |c|
     c.action do
-      # app.process_flacs
+      app.process_flacs
       app.process_aiffs
       app.process_mp3s
     end
