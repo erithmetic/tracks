@@ -14,7 +14,7 @@ module Beats
         year: tags['date'],
         track_number: tags['track'],
         comment: tags['ID3v1 Comment'],
-        genre: tags['genre'],
+        genre: tags['genre']&.split(',') || [],
       )
     end
 

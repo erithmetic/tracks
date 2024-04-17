@@ -51,7 +51,7 @@ module Beats
         artist: artist || other.artist,
         title: title || other.title,
         year: year || other.year,
-        genres: genres,
+        genres: genres || other.genres,
         discogs_url: discogs_url || other.discogs_url,
         tracks: merge_tracks(other.tracks),
         all_artists: (all_artists + other.all_artists).uniq,

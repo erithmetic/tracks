@@ -51,7 +51,8 @@ module Beats
         artist: metadata.artist,
         title: metadata.album,
         year: metadata.year,
-        tracks: [track_from_metadata(metadata)]
+        tracks: [track_from_metadata(metadata)],
+        genres: metadata.genre,
       )
     end
 

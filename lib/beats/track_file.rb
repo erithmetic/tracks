@@ -62,7 +62,7 @@ module Beats
         year: album.year,
         track_number: track.number,
         description: comments,
-        genre: album.genres.join(', ')
+        genre: album.genres&.join(', ')
       )
     end
 
