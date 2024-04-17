@@ -42,10 +42,11 @@ class App
     filename = File.basename path
     dest = File.join(TRACKS_PATH, filename)
     source_file = Beats::TrackFile.read library: library, path: path
-    dest_file = Beats::DestinationTrackFile.new album: source_file.album, track: source_file.track
+    dest_file = Beats::DestinationTrackFile.new album: source_file.album, track: source_file.track, ext: source_file.ext
     dest_file.ensure_dest_path!
     puts "#{source_file.path} => #{dest_file.path}"
     FileUtils.cp source_file.path, dest_file.path
+    dest_file.write_metadata! unless dest_file.album.serial.nil?
   end
 
   def process_aiffs

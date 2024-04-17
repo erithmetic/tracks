@@ -31,12 +31,12 @@ flowchart LR
   tag[/MP3Tag/]
   beats[(Beats.csv catalog)]
   discogs[(Discogs.com API)]
-  rx10[/AudioLava<br>RX 10 Repair Assistant/]
+  denoise[/"Audacity<br>de-noise, de-click"/]
   usb[(USB)]
 
   internet --> digital
   digital --> tag --> digital
-  vinyl --> rx10 --> vinyl_script --> digital
+  vinyl --> denoise --> vinyl_script --> digital
   digital --> export_script --> tracks --> pdj
   pdj --> mik --> tracks
   beats --> export_script

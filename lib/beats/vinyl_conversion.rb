@@ -25,7 +25,7 @@ module Beats
     end
 
     def max_volume
-      out = FFMPEG.execute "-i \"#{dest_file.path}\" -filter:a volumedetect -f null /dev/null"
+      out = FFMPEG.execute dest_file.path, "-filter:a volumedetect -f null", "/dev/null"
       out.match(/max_volume: (-?\d+\.\d+)/)[1].to_f
     end
 
@@ -64,7 +64,7 @@ module Beats
         'silenceremove=start_periods=1:start_silence=0:start_threshold=0.02'
       ]
 
-      FFMPEG.apply! dest_file.path, "-c:a pcm_s24be -filter:a \"#{filters.join(', ')}\""
+      FFMPEG.modify! dest_file.path, "-c:a pcm_s24be -filter:a \"#{filters.join(', ')}\""
       dest_file.write_cover_image!
       dest_file.write_metadata!
     end

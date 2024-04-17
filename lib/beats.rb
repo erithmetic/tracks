@@ -14,8 +14,8 @@ module Beats
       next if album_dir =~ /^\./ || !File.directory?(album_dir)
       catalog_number = File.basename album_dir
 
-      Dir.glob(File.join(album_dir, 'cleaned', '*.aiff')).each do |file|
-        track_number = File.basename(file, '*.aiff')
+      Dir.glob(File.join(album_dir, 'cleaned', "*#{AIFF_EXT}")).each do |file|
+        track_number = File.basename(file, AIFF_EXT)
         blk.call catalog_number, track_number, file
       end
     end
@@ -48,7 +48,7 @@ module Beats
           artist: row['Artist'],
           title: row['Album'],
           year: row['Year'],
-          genres: (row['Genres'] || '').split(/,\s*/),
+          genres: (row['Genres'] ? row['Genres'].split(/,\s*/) : []),
           discogs_url: row['URL'],
           tracks: tracks
         )

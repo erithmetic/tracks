@@ -4,27 +4,24 @@ require_relative './sanitize'
 
 module Beats
   class TrackFile    
-    attr_reader :path, :album, :track, :metadata, :cover_image_path
+    attr_reader :path, :album, :track, :metadata, :cover_image_path, :ext
 
     def self.read(library:, path:, cover_image_path: nil)
       metadata = FFMPEG.info path
       track = library.find_track_by_metadata metadata
-      new path: path, album: track.album, track: track, cover_image_path: cover_image_path
+      new path: path, album: track.album, track: track, cover_image_path: cover_image_path, ext: '.' + path.split('.').last
     end
 
-    def initialize(path:, album:, track:, cover_image_path: nil)
+    def initialize(path:, album:, track:, ext: nil, cover_image_path: nil)
       @path = path
       @album = album
       @track = track
+      @ext = ext || path.split('.').last
       @cover_image_path = cover_image_path || track.album.cover_image_path
     end
 
     def exist?
       File.exist? path
-    end
-
-    def ext
-      path.split('.').last
     end
 
     def dirname

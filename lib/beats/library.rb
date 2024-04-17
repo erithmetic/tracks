@@ -34,9 +34,11 @@ module Beats
     
     def track_from_catalog_and_track(catalog_number:, track_number:)
       album = album_from_beats catalog_number
+      raise "Album not found: #{catalog_number}" if album.nil?
+
       album = album.merge(album_from_discogs(album.discogs_url))
       track = album.find_track(track_number)
-      raise "Track not found: #{metadata.inspect}" if track.nil?
+      raise "Track #{track_number} not found in album #{album.inspect}" if track.nil?
 
       track
     end
