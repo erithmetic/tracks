@@ -20,8 +20,8 @@ class App
     @app ||= new
   end
 
-  switch [:f,:force], :default_value => 'false'
-
+  switch %i{f force}, default_value: 'false'
+  
   command :vinyl do |c|
     c.action do |global_options|
       app.process_vinyl force: global_options[:force]
@@ -78,7 +78,7 @@ class App
       )
 
       if converter.process! force: force
-        puts "#{converter.album.title} - #{converter.track.title}..."
+        puts "#{catalog_number} - #{converter.album.title} - #{converter.track.title}..."
       end
     end
   end
