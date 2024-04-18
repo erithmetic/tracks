@@ -24,37 +24,13 @@ module Beats
       @dest_file = VinylTrackFile.new album: album, track: track
     end
 
-    def max_volume
-      out = FFMPEG.execute dest_file.path, "-filter:a volumedetect -f null", "/dev/null"
-      out.match(/max_volume: (-?\d+\.\d+)/)[1].to_f
-    end
-
-    def amplification_amount(current_volume)
-      if current_volume == MAX_VOLUME
-        0
-      elsif current_volume < MAX_VOLUME
-        current_volume.abs - MAX_VOLUME.abs
-      else
-        -1 * current_volume + MAX_VOLUME
-      end
-    end
-
     def process!
       dest_file.ensure_dest_path!
       return if dest_file.exist?
 
       FileUtils.cp source_file.path, dest_file.path
 
-      filters = []
-      current_volume = max_volume
-      adjustment = amplification_amount(current_volume)
-      changes = [current_volume, current_volume]
-      if adjustment != 0.0
-        filters << "volume=#{adjustment}dB"
-        changes = [current_volume, current_volume + adjustment]
-      end
-
-      filters += [
+      apply_ffmpeg_filters!([
         'highpass=20',
         'areverse',
         'atrim=start=0',
@@ -62,11 +38,15 @@ module Beats
         'areverse',
         'atrim=start=0',
         'silenceremove=start_periods=1:start_silence=0:start_threshold=0.02'
-      ]
+      ])
+      apply_ffmpeg_filters!(['dynaudnorm=p=0.95'])
 
-      FFMPEG.modify! dest_file.path, "-c:a pcm_s24be -filter:a \"#{filters.join(', ')}\""
       dest_file.write_cover_image!
       dest_file.write_metadata!
+    end
+
+    def apply_ffmpeg_filters!(filters = [])
+      FFMPEG.modify! dest_file.path, "-c:a pcm_s24be -filter:a \"#{filters.join(', ')}\""
     end
   end
 end
