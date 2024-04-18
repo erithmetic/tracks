@@ -24,9 +24,9 @@ module Beats
       @dest_file = VinylTrackFile.new album: album, track: track
     end
 
-    def process!
+    def process!(force: false)
       dest_file.ensure_dest_path!
-      return if dest_file.exist?
+      return if !force && dest_file.exist?
 
       FileUtils.cp source_file.path, dest_file.path
 

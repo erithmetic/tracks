@@ -20,9 +20,11 @@ class App
     @app ||= new
   end
 
+  switch [:f,:force], :default_value => 'false'
+
   command :vinyl do |c|
-    c.action do
-      app.process_vinyl
+    c.action do |global_options|
+      app.process_vinyl force: global_options[:force]
     end
   end
 
@@ -66,7 +68,7 @@ class App
     end
   end
 
-  def process_vinyl
+  def process_vinyl(force: false)
     Beats.each_vinyl_track do |catalog_number, track_number, path|
       converter = Beats::VinylConversion.from_file(
         library: library,
@@ -75,7 +77,7 @@ class App
         path: path
       )
 
-      if converter.process!
+      if converter.process! force: force
         puts "#{converter.album.title} - #{converter.track.title}..."
       end
     end
