@@ -8,7 +8,7 @@ require_relative './track_file'
 module Beats
   module FFMPEG
     def self.probe(path, params)
-      `ffprobe #{params}`
+      `ffprobe #{params} #{Shellwords.escape(path)}`
     end
 
     def self.execute(input_path, params, output_path = nil)
@@ -53,7 +53,7 @@ module Beats
     end
 
     def self.info(path)
-      json = probe "-loglevel error -show_entries stream_tags:format_tags -of json \"#{path}\""
+      json = probe path, "-loglevel error -show_entries stream_tags:format_tags -of json"
       Metadata.from_from_ffprobe JSON.parse(json)
     end
   end

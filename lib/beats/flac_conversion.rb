@@ -24,7 +24,7 @@ module Beats
 
       dest_file.ensure_dest_path!
 
-      FFMPEG.convert! source_file.path, "-y -c:a pcm_s24be -id3v2_version 3 -write_id3v2 1", dest_file.path
+      FFMPEG.execute source_file.path, "-y -c:a pcm_s24be -id3v2_version 3 -write_id3v2 1", dest_file.path
       dest_file.write_cover_image!
       dest_file.write_metadata!
 
