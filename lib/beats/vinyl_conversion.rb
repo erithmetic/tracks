@@ -39,7 +39,7 @@ module Beats
         'atrim=start=0',
         'silenceremove=start_periods=1:start_silence=0:start_threshold=0.02'
       ])
-      apply_ffmpeg_filters!(['dynaudnorm=p=0.95'])
+      apply_ffmpeg_filters!(['dynaudnorm=p=0.95:altboundary=1'])
 
       dest_file.write_cover_image!
       dest_file.write_metadata!
