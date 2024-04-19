@@ -63,9 +63,9 @@ flowchart LR
 1. in Rekordbox, re-import rekordbox.xml into collection
 1. have a cup of tea
 
-# Vinyl recording notes
+# Recording notes
 
-## Recording settings:
+## Vinyl recording settings:
 
 Peak ampitude: -5.04 dB
 Total RMS: -22.02 dB
@@ -73,6 +73,17 @@ Dynamic range: 44.00 dB
 Loudness: -19.02 LUFS
 
 96kHz, 32-bit float aup
+
+## Audio formats
+
+https://cookingtechno.com/cdj-audio-export/
+
+CDJ-850 (2010)
+Formats: MP3, AAC, WAV, AIFF
+Bit depth: 16 & 24 Bit
+Bitrate: 32 Kbps to 320 Kbps
+Sample rate, lossy: 32 kHz, 44.1 kHz, 48 kHz
+Sample rate, lossless: 44.1 kHz, 48 kHz FAT16, FAT32, HFS+
 
 ## Cleanup:
 
