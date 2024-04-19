@@ -9,8 +9,8 @@ require_relative './beats/vinyl_conversion'
 module Beats
   BEATS_CSV_PATH=File.expand_path('../../beats.csv', __FILE__)
 
-  def self.each_vinyl_track(&blk)
-    Dir.glob("#{VINYL_PATH}/*").each do |album_dir|
+  def self.each_vinyl_track(source_path, &blk)
+    Dir.glob("#{source_path}/*").each do |album_dir|
       next if album_dir =~ /^\./ || !File.directory?(album_dir)
       catalog_number = File.basename album_dir
 

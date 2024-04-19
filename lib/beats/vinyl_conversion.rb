@@ -13,14 +13,13 @@ module Beats
 
     def self.from_file(library:, catalog_number:, track_number:, path:)
       track = library.track_from_catalog_and_track catalog_number: catalog_number, track_number: track_number
-      new track: track
+      new track: track, path: path
     end
 
-    def initialize(track:)
+    def initialize(track:, path:)
       @track = track
       @album = track.album
-      source_path = File.join(VINYL_PATH, album.serial, 'cleaned', track.number.to_s) + SOURCE_EXT
-      @source_file = TrackFile.new path: source_path, album: album, track: track
+      @source_file = TrackFile.new path: path, album: album, track: track
       @dest_file = VinylTrackFile.new album: album, track: track
     end
 
@@ -37,7 +36,7 @@ module Beats
         'silenceremove=start_periods=1:start_silence=0:start_threshold=0.02',
         'areverse',
         'atrim=start=0',
-        'silenceremove=start_periods=1:start_silence=0:start_threshold=0.02'
+        'silenceremove=start_periods=1:start_silence=0:start_threshold=0.02',
       ])
       apply_ffmpeg_filters!(['dynaudnorm=p=0.95:altboundary=1'])
 
@@ -46,7 +45,7 @@ module Beats
     end
 
     def apply_ffmpeg_filters!(filters = [])
-      FFMPEG.modify! dest_file.path, "-c:a pcm_s24be -filter:a \"#{filters.join(', ')}\""
+      FFMPEG.modify! dest_file.path, "-c:a pcm_s24be -ar 44100 -filter:a \"#{filters.join(', ')}\""
     end
   end
 end

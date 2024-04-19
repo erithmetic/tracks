@@ -20,11 +20,12 @@ class App
     @app ||= new
   end
 
-  switch %i{f force}, default_value: 'false'
   
   command :vinyl do |c|
-    c.action do |global_options|
-      app.process_vinyl force: global_options[:force]
+    c.switch %i{f force}, default_value: false
+    c.flag %i{s source_path}, default_value: VINYL_PATH, type: String
+    c.action do |global_options, options|
+      app.process_vinyl force: global_options[:force], source_path: options[:source_path]
     end
   end
 
@@ -68,8 +69,8 @@ class App
     end
   end
 
-  def process_vinyl(force: false)
-    Beats.each_vinyl_track do |catalog_number, track_number, path|
+  def process_vinyl(source_path:, force: false)
+    Beats.each_vinyl_track(source_path) do |catalog_number, track_number, path|
       converter = Beats::VinylConversion.from_file(
         library: library,
         catalog_number: catalog_number,
