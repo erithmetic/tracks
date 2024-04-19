@@ -19,13 +19,12 @@ class App
   def self.app
     @app ||= new
   end
-
   
   command :vinyl do |c|
     c.switch %i{f force}, default_value: false
     c.flag %i{s source_path}, default_value: VINYL_PATH, type: String
-    c.action do |global_options, options|
-      app.process_vinyl force: global_options[:force], source_path: options[:source_path]
+    c.action do |_, options|
+      app.process_vinyl force: options[:force], source_path: options[:source_path]
     end
   end
 
