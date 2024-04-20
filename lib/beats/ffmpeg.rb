@@ -46,6 +46,14 @@ module Beats
       FFMPEG.modify! path, "-c:a pcm_s24be -ar 44100 #{metadata_commands} -id3v2_version 3 -write_id3v2 1"
     end
 
+    def self.write_mp3_id3!(path, metadata)
+      metadata_commands = metadata.to_ffmpeg_metadata.inject("") do |list, (key, value)|
+        list = list + "-metadata #{key}=\"#{value.to_s.gsub(/"/,"\\\"")}\" "
+      end
+
+      FFMPEG.modify! path, "#{metadata_commands} -id3v2_version 3 -write_id3v2 1"
+    end
+
     def self.write_cover_image!(path, cover_image_path)
       if cover_image_path && File.exist?(cover_image_path)
         FFMPEG.modify! path, "-i \"#{cover_image_path}\" -c copy -map 0 -map 1 -id3v2_version 3 -write_id3v2 1"
@@ -54,7 +62,7 @@ module Beats
 
     def self.info(path)
       json = probe path, "-loglevel error -show_entries stream_tags:format_tags -of json"
-      Metadata.from_from_ffprobe JSON.parse(json)
+      Metadata.from_ffprobe JSON.parse(json)
     end
   end
 end

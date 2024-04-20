@@ -7,8 +7,6 @@ require_relative './vinyl_track_file'
 
 module Beats
   class VinylConversion
-    SOURCE_EXT = '.aiff'
-
     attr_reader :source_file, :dest_file, :album, :track
 
     def self.from_file(library:, catalog_number:, track_number:, path:)

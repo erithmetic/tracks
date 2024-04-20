@@ -4,8 +4,8 @@ module Beats
     FFMPEG_METADATA_KEYS = %i{ALBUM ARTIST DATE description genre TITLE track CATALOGNUMBER album_artist comment}
     FFPROBE_METADATA_KEYS = ['title', 'artist', 'track' 'album', 'ID3v1 Comment']
 
-    def self.from_from_ffprobe(json)
-      tags = json.fetch('format').fetch('tags')
+    def self.from_ffprobe(json)
+      tags = json.fetch('format', {}).fetch('tags', {})
       new(
         catalog_number: tags['CATALOGNUMBER'],
         album: tags['album'],

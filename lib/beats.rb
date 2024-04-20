@@ -27,6 +27,12 @@ module Beats
     end
   end
 
+  def self.each_wav(&blk)
+    Dir.glob("#{DIGITAL_PATH}/**/*.wav").each do |f|
+      blk.call f
+    end
+  end
+
   def self.parse_albums
     albums = []
 

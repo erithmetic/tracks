@@ -8,7 +8,7 @@ module Beats
 
     def self.read(library:, path:, cover_image_path: nil)
       metadata = FFMPEG.info path
-      track = library.find_track_by_metadata metadata
+      track = library.find_track_by_metadata(metadata) or raise "Track not found for #{path}"
       new path: path, album: track.album, track: track, cover_image_path: cover_image_path, ext: '.' + path.split('.').last
     end
 
@@ -68,7 +68,11 @@ module Beats
     end
 
     def write_metadata!
-      FFMPEG.write_id3! path, metadata
+      if ext == '.mp3'
+        FFMPEG.write_mp3_id3! path, metadata
+      else
+        FFMPEG.write_id3! path, metadata
+      end
     end
 
     def write_cover_image!
