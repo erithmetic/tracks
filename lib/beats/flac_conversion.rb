@@ -20,7 +20,7 @@ module Beats
     end
 
     def process!
-      return false if dest_file.exist? || source_file.album.serial.nil?
+      return false if dest_file.exist?
 
       dest_file.ensure_dest_path!
 

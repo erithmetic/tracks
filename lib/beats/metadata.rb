@@ -8,10 +8,10 @@ module Beats
       tags = json.fetch('format', {}).fetch('tags', {})
       new(
         catalog_number: tags['CATALOGNUMBER'],
-        album: tags['album'],
-        artist: tags['artist'],
-        title: tags['title'],
-        year: tags['date'],
+        album: tags['album'] || tags['ALBUM'],
+        artist: tags['artist'] || tags['ARTIST'],
+        title: tags['title'] || tags['TITLE'],
+        year: tags['date'] || tags['DATE'],
         track_number: tags['track'],
         comment: tags['ID3v1 Comment'],
         genre: tags['genre']&.split(',') || [],
